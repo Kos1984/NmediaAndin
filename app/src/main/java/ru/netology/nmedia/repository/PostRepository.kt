@@ -14,5 +14,11 @@ interface PostRepository {
         fun onSuccess(posts:List<Post>)
         fun onError()
     }
+
+    fun saveAsync(callback: SaveCallback, post: Post)
+    interface SaveCallback {
+        fun onSuccess()
+        fun onError()
+    }
 }
 

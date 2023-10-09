@@ -98,6 +98,26 @@ class PostRepositoryImpl: PostRepository {
             .close()
     }
 
+    override fun saveAsync(callback: PostRepository.SaveCallback, post: Post) {
+        val request: Request = Request.Builder()
+            .post(gson.toJson(post).toRequestBody(jsonType))
+            .url("${BASE_URL}/api/slow/posts")
+            .build()
+        client.newCall(request)
+            .enqueue(object : Callback{
+                override fun onResponse(call: Call, response: Response) {
+                    try {
+                        callback.onSuccess()
+                    } catch (e: Exception) {
+                        callback.onError()
+                    }
+                }
+                override fun onFailure(call: Call, e: IOException) {
+                    callback.onError()
+                }
+            })
+    }
+
     override fun removeById(id: Long) {
         val request: Request = Request.Builder()
             .delete()
