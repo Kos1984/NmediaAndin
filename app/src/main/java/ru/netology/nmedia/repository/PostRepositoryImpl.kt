@@ -28,20 +28,8 @@ class PostRepositoryImpl: PostRepository {
         private val jsonType = "application/json".toMediaType()
     }
 
-    override fun getAll(): List<Post> {
-        val request: Request = Request.Builder()
-            .url("${BASE_URL}/api/posts")
-            .build()
 
-        return client.newCall(request)
-            .execute()
-            .let { it.body?.string() ?: throw RuntimeException("body is null") }
-            .let {
-                gson.fromJson(it, typeToken.type)
-            }
-    }
-
-    override fun getAllAsync(callback: PostRepository.GetAllCallback) {
+    override fun getAllAsync(callback: PostRepository.RepositoryCallback<List<Post>>) {
         val request: Request = Request.Builder()
             .url("${BASE_URL}/api/posts")
             .build()
@@ -64,41 +52,31 @@ class PostRepositoryImpl: PostRepository {
             })
     }
 
-    override fun likeById(id: Long, likedByMe: Boolean) : Post {
-        if (!likedByMe){
-            request1 = Request.Builder()
+    override fun likeByIdAsync(callback: PostRepository.RepositoryCallback<Post>, id: Long, likedByMe: Boolean) {
+        request1 = if (!likedByMe){
+            Request.Builder()
                 .post(EMPTY_REQUEST)
                 .url("${BASE_URL}/api/posts/$id/likes")
                 .build()
         }else {
-            request1 = Request.Builder()
+            Request.Builder()
                 .delete(EMPTY_REQUEST)
                 .url("${BASE_URL}/api/posts/$id/likes")
                 .build()
         }
-
-        return client.newCall(request1!!)
-            .execute()
-            .let{ it.body?.string() ?: throw RuntimeException("body is null")}
-            .let {
-                gson.fromJson(it, Post ::class.java)
-            }
-
-
+        client.newCall(request1!!)
+            .enqueue(object : Callback{
+                override fun onResponse(call: Call, response: Response) {
+                    val body = response.body?.string() ?: throw RuntimeException("body is null")
+                    callback.onSuccess( gson.fromJson(body, Post ::class.java))
+                }
+                override fun onFailure(call: Call, e: IOException) {
+                    callback.onError()
+                }
+            })
     }
 
-    override fun save(post: Post) {
-        val request: Request = Request.Builder()
-            .post(gson.toJson(post).toRequestBody(jsonType))
-            .url("${BASE_URL}/api/posts")
-            .build()
-
-        client.newCall(request)
-            .execute()
-            .close()
-    }
-
-    override fun saveAsync(callback: PostRepository.SaveCallback, post: Post) {
+    override fun saveAsync(callback: PostRepository.RepositoryCallback<Unit>, post: Post) {
         val request: Request = Request.Builder()
             .post(gson.toJson(post).toRequestBody(jsonType))
             .url("${BASE_URL}/api/slow/posts")
@@ -107,7 +85,7 @@ class PostRepositoryImpl: PostRepository {
             .enqueue(object : Callback{
                 override fun onResponse(call: Call, response: Response) {
                     try {
-                        callback.onSuccess()
+                        callback.onSuccess(Unit)
                     } catch (e: Exception) {
                         callback.onError()
                     }
@@ -127,5 +105,21 @@ class PostRepositoryImpl: PostRepository {
         client.newCall(request)
             .execute()
             .close()
+    }
+    override fun removeByIdAsync(callback: PostRepository.RepositoryCallback<Unit>, id: Long) {
+        val request: Request = Request.Builder()
+            .delete()
+            .url("${BASE_URL}/api/posts/$id")
+            .build()
+        client.newCall(request)
+            .enqueue(object : Callback{
+                override fun onResponse(call: Call, response: Response) {
+                    callback.onSuccess(Unit)
+                }
+                override fun onFailure(call: Call, e: IOException) {
+                    callback.onError()
+                }
+
+            })
     }
 }
