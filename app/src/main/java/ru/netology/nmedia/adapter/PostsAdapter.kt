@@ -1,6 +1,7 @@
 package ru.netology.nmedia.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
+import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.Post
 
 interface OnInteractionListener {
@@ -40,8 +42,9 @@ class PostViewHolder(
 
 
     fun bind(post: Post) {
-        val avatarUrl = post.authorAvatar
-        val url: String = "http://10.0.2.2:9999/avatars/${avatarUrl}"
+        //val avatarUrl = post.authorAvatar
+        val url: String = "http://10.0.2.2:9999/avatars/${post.authorAvatar}"
+        val attachmentUrl = "http://10.0.2.2:9999//images/${post.attachment?.url}"
         binding.apply {
 
             author.text = post.author
@@ -51,6 +54,11 @@ class PostViewHolder(
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
             avatar.load(url)
+
+            if (attachmentUrl != "http://10.0.2.2:9999//images/null"){
+                attachmentView.visibility = View.VISIBLE
+                attachmentView.loadAttach(attachmentUrl)
+            }else attachmentView.visibility = View.GONE
 
 
 
