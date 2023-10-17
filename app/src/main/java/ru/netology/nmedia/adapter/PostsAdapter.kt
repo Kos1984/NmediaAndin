@@ -50,11 +50,8 @@ class PostViewHolder(
             // в адаптере
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
-            if (url != "http://10.0.2.2:9999/avatars/"){
-                avatar.load(url)
-            } else {
-                avatar.setImageResource(R.drawable.non_avatar_100dp)
-            }
+            avatar.load(url)
+
 
 
             menu.setOnClickListener {
