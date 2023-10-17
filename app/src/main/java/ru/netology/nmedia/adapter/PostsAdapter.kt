@@ -2,6 +2,7 @@ package ru.netology.nmedia.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -36,14 +37,25 @@ class PostViewHolder(
     private val onInteractionListener: OnInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
+
+
     fun bind(post: Post) {
+        val avatarUrl = post.authorAvatar
+        val url: String = "http://10.0.2.2:9999/avatars/${avatarUrl}"
         binding.apply {
+
             author.text = post.author
             published.text = post.published
             content.text = post.content
             // в адаптере
             like.isChecked = post.likedByMe
             like.text = "${post.likes}"
+            if (url != "http://10.0.2.2:9999/avatars/"){
+                avatar.load(url)
+            } else {
+                avatar.setImageResource(R.drawable.non_avatar_100dp)
+            }
+
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {

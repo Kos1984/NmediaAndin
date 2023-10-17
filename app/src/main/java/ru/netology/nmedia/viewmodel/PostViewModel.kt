@@ -13,6 +13,7 @@ private val empty = Post(
     id = 0,
     content = "",
     author = "",
+    authorAvatar = "",
     likedByMe = false,
     likes = 0,
     published = ""
@@ -96,8 +97,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeById(id: Long) {
-
-
             // Оптимистичная модель
             val old = _data.value?.posts.orEmpty()
             try {

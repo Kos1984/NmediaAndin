@@ -31,7 +31,7 @@ class PostRepositoryImpl: PostRepository {
 
     override fun getAllAsync(callback: PostRepository.RepositoryCallback<List<Post>>) {
         val request: Request = Request.Builder()
-            .url("${BASE_URL}/api/posts")
+            .url("${BASE_URL}/api/slow/posts")
             .build()
         client.newCall(request)
             .enqueue(object : Callback{
@@ -56,12 +56,12 @@ class PostRepositoryImpl: PostRepository {
         request1 = if (!likedByMe){
             Request.Builder()
                 .post(EMPTY_REQUEST)
-                .url("${BASE_URL}/api/posts/$id/likes")
+                .url("${BASE_URL}/api/slow/posts/$id/likes")
                 .build()
         }else {
             Request.Builder()
                 .delete(EMPTY_REQUEST)
-                .url("${BASE_URL}/api/posts/$id/likes")
+                .url("${BASE_URL}/api/slow/posts/$id/likes")
                 .build()
         }
         client.newCall(request1!!)
@@ -99,7 +99,7 @@ class PostRepositoryImpl: PostRepository {
     override fun removeById(id: Long) {
         val request: Request = Request.Builder()
             .delete()
-            .url("${BASE_URL}/api/posts/$id")
+            .url("${BASE_URL}/api/slow/posts/$id")
             .build()
 
         client.newCall(request)
@@ -109,7 +109,7 @@ class PostRepositoryImpl: PostRepository {
     override fun removeByIdAsync(callback: PostRepository.RepositoryCallback<Unit>, id: Long) {
         val request: Request = Request.Builder()
             .delete()
-            .url("${BASE_URL}/api/posts/$id")
+            .url("${BASE_URL}/api/slow/posts/$id")
             .build()
         client.newCall(request)
             .enqueue(object : Callback{
