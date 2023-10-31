@@ -2,8 +2,6 @@ package ru.netology.nmedia.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
-import ru.netology.nmedia.dto.Attachment
-import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.repository.*
@@ -12,13 +10,12 @@ import java.io.IOException
 
 private val empty = Post(
     id = 0,
-    content = "",
     author = "",
     authorAvatar = "",
+    content = "",
+    published = "",
     likedByMe = false,
     likes = 0,
-    published = "",
-    attachment = Attachment(null, "", AttachmentType.IMAGE ),
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
@@ -41,10 +38,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             _data.postValue(FeedModel(loading = true))
         repository.getAllAsync(object : PostRepository.RepositoryCallback<List<Post>>{
             override fun onSuccess(value: List<Post>) {
-                _data.postValue(FeedModel(posts = value, empty = value.isEmpty()))
+                _data.value = (FeedModel(posts = value, empty = value.isEmpty()))
             }
 
-            override fun onError() {
+            override fun onError(e: Exception) {
+                println(e)
                 _data.postValue(FeedModel(error = true))
             }
 
@@ -55,12 +53,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value?.let {
             repository.saveAsync(object : PostRepository.RepositoryCallback<Unit>{
                 override fun onSuccess(value: Unit) {
-                    loadPosts()
+                    //loadPosts()
+                    _postCreated.value = Unit
                 }
-                override fun onError() {
+                override fun onError(e: Exception) {
+                    _data.value = FeedModel(error = true)
                 }
             }, it)
-            _postCreated.postValue(Unit)
+            //_postCreated.postValue(Unit)
         }
         edited.value = empty
     }
@@ -90,7 +90,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 )
             }
 
-            override fun onError() {
+            override fun onError(e: Exception) {
                 TODO("Not yet implemented")
             }
 
@@ -111,8 +111,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                         )
                     }
 
-                    override fun onError() {
-                        TODO("Not yet implemented")
+                    override fun onError(e: Exception) {
+                        println(e)
                     }
 
                 }, id)
