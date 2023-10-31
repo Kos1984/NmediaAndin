@@ -30,6 +30,9 @@ interface PostApiService {
     @POST("posts/{id}/likes")
     fun likeById(@Path("id") id: Long): Call<Post>
 
+    @DELETE("posts/{id}/likes")
+    fun deleteLikeById(@Path("id") id: Long): Call<Post>
+
 }
 // создаем и настраиваем логгер
 val logger = HttpLoggingInterceptor().apply {

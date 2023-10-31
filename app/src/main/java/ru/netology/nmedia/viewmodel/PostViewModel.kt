@@ -53,14 +53,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value?.let {
             repository.saveAsync(object : PostRepository.RepositoryCallback<Unit>{
                 override fun onSuccess(value: Unit) {
-                    //loadPosts()
                     _postCreated.value = Unit
                 }
                 override fun onError(e: Exception) {
                     _data.value = FeedModel(error = true)
                 }
             }, it)
-            //_postCreated.postValue(Unit)
         }
         edited.value = empty
     }
@@ -91,7 +89,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             override fun onError(e: Exception) {
-                TODO("Not yet implemented")
+                println(e)
+                _data.postValue(FeedModel(error = true))
             }
 
         }, id, likedByMe)
@@ -113,6 +112,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
                     override fun onError(e: Exception) {
                         println(e)
+                        _data.postValue(FeedModel(error = true))
                     }
 
                 }, id)
